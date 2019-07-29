@@ -3,7 +3,8 @@
 
  
 \usepackage[utf8]{inputenc}
- 
+\usepackage{graphicx}
+\graphicspath{ {./imagenes/} }
  
 %Informacion para el titulo
 \title[Correo Electronico] %Titulo+Tag
@@ -33,8 +34,321 @@
 
 
 \begin{frame}
-\frametitle{Conceptos Basicos}
+\frametitle{Elementos Basicos}
 \tableofcontents
+
+\begin{itemize}
+\item \textbf{Agente usuario (MUA):} Es el componente del correo electrónico que lidia con la composición, edición y lectura de los mensajes de correo. En este área ocurre la entrada y salida de los mensajes almacenados en el servidor. 
+\item \textbf{ Agente de transferencia (MTA):}
+El servicio de software que se encarga de retransmitir los mensajes hasta el destinatario.
+\item \textbf{Agente de entrega al sistema (MSA):}
+El programa o interfaz que recibe inicialmente el correo electrónico de un MUA e ingresa el mismo a la infraestructura de comunicación que utiliza MTA para ser transmitido hasta su destinatario. 
+\item \textbf{Agente de entrega final (MDA):}
+El ultimo componente de la transmisión de correo al recipiente. Se encarga de guardar y enviar los mensajes al usuario final. El proceso de envío y recepción se da por medio de protocolos.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Elementos Basicos}
+\tableofcontents
+
+\begin{block}{Aclaracion}
+Se trata a MSA comunmente en conjunto con MTA y a otros elementos de la red, definiendolo como simplemente MTA. Sin embargo, hay ciertos beneficios de mantener a ambos como entidades separadas que deben cooperar:
+\begin{itemize}
+\item El MSA puede tener funcionalidad para revisar correos electrónicos antes de ingresarlos a la red.
+\item El servicio tiene un puerto dedicado (587) aparte de los de MTA (25); la conexión directa a MTA suele estar restringida, mientras que MSA no. Eso permite distintos comportamientos al recibir mensajes, como para revisar correos en busca de virus y filtrar spam
+\end{itemize}
+\end{block}
+
+\end{frame}
+\begin{frame}
+\frametitle{Elementos Basicos-Ejemplo}
+\tableofcontents
+
+Ejemplo de red de comunicacion de Correo Electronico
+\includegraphics[scale=0.8]{TPCorreoElectronico_Imagen1.png}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Operacion de Correo (1/5)}
+\tableofcontents
+
+\centering
+\includegraphics[scale=0.25]{TPCorreoElectronico_Imagen2.png}
+\begin{itemize}
+\item El MUA le da formato de mail al mensaje y usa el protocolo de presentación, un perfil del protocolo para transferencia simple de correo (SMTP), para enviar el contenido del mensaje al MSA, en este caso smtp.a.org.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Operacion de Correo (2/5)}
+\tableofcontents
+\centering
+\includegraphics[scale=0.25]{TPCorreoElectronico_Imagen2.png}
+\begin{itemize}
+\item \small El MSA determina la dirección destino proporcionada en el protocolo SMTP, en este caso bob@b.org, una dirección de dominio completa (FODA). La parte que está antes de la @ es la parte local de la dirección, y la parte que está después de la @ es el nombre del dominio.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Operacion de Correo (3/5)}
+\tableofcontents
+\centering
+\includegraphics[scale=0.25]{TPCorreoElectronico_Imagen2.png}
+\begin{itemize}
+\item \small El servidor DNS del dominio b.org (ns.b.org) responde con cualquier registro MX que liste los servidores de intercambio de correo para ese dominio, en este caso mx.b.org, un servidor MTA ejecutado por el ISP del destinatario.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Operacion de Correo (4/5)}
+\tableofcontents
+\centering
+\includegraphics[scale=0.25]{TPCorreoElectronico_Imagen2.png}
+\begin{itemize}
+\item smtp.a.org envia el mensaje a mx.b.org usando SMTP. Este servidor podría necesitar enviar el mensaje a otros MTAs antes de que el mensaje llegue al último MDA
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Operacion de Correo (5/5)}
+\tableofcontents
+\centering
+\includegraphics[scale=0.25]{TPCorreoElectronico_Imagen2.png}
+\begin{itemize}
+\item \small El MDA lo entrega a la bandeja de entrada del usuario bob.
+\item \small El MUA de bob recibe el mensaje usando el protocolo de oficina de correo (POP3) o el protocolo de acceso de mensajes de internet (IMAP).
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Protocolos -  SMTP(1/3)}
+\tableofcontents
+\textbf{SMTP} es un protocolo de envio de email basado en la comunicación mediante comandos de texto e información a través de un canal de transmisión, típicamente uno de protocolo TCP de conexión.
+
+La transferencia lleva tres fases: \textbf{Saludo}, \textbf{transferencia de mensajes}, y\textbf{ cierre}.  Funciona recibiendo comandos en ASCII del cliente y dando las respuestas indicadas para abrir e intercambiar los parámetros de la sesión.
+El iniciante de la comunicación a un servidor de email puede ser tanto:
+\begin{itemize}
+\item \small \textbf{MUA:} conoce la dirección del servidor por medio de su configuración
+\item \small \textbf{MTA:} otro servidor que se utiliza para retransmitir de forma automatizada los mensajes.  Determina a qué servidor conectarse por medio de los recursos de MX de DNS de los recipientes por los que actúa. 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Protocolos -  SMTP(2/3)}
+\tableofcontents
+Una sesión de SMTP de envío de mensaje del cliente al servidor, para su consecuente envío al receptor de mensaje, consiste en el intercambio de información, compuesto por la secuencia de 3 comandos:
+\begin{itemize}
+\item  \small \textbf{MAIL:} para establecer la dirección de retorno, donde llegarán las respuestas de estado de comunicación.
+\item  \small \textbf{RCPT:} para establecer el/los recipientes del mensaje.
+\item  \small \textbf{DATA:} que dentro del mensaje señala que comienza el texto del mensaje; técnicamente es una serie de comandos y además el contenido del mensaje. El contenido consiste de tanto un encabezado del mensaje y  el cuerpo del mismo, separados por una línea. En esta comunicación, el servidor responde 2 veces al comando: una cuando recibe el/los comandos DATA y otra cuando recibe la secuencia de finalizado, en cuyo caso informa de si se aceptó o no la información.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Protocolos -  SMTP(3/3)}
+\tableofcontents
+Además de la comunicación en la fase de DATA, el servidor responde a 3 situaciones posibles:
+\begin{itemize}
+\item  \small \textbf{Respuestas 2xx:} La comunicación se realizó de forma satisfactoria o dio resultado positivo
+\item  \small \textbf{Respuestas 4xx:} Un rechazo donde la comunicación tuvo un fallo y el mensaje no se pudo enviar/recibir con éxito (sin espacio de memoria, destinatario no existe, etc.)
+\item  \small \textbf{Respuestas 5xx:} Un rechazo donde la comunicación se realizo con exito pero por razones de protocolo el mensaje fue negado su envío al destinatario (Links maliciosos, spam, formato no usable).
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Protocolos -  POP3(1/2)}
+\tableofcontents
+El\textbf{ Protocolo de Oficina de Correo} es un protocolo de recibo de mail desde un servidor de correos. El protocolo permite operaciones de descarga y borrado de mensajes del servidor en cuestión.
+
+La comunicación consiste en la conexion del cliente al servidor, la descarga de los correos y su borrado de la base de datos del servidor, usando esta como contenedor de información temporal, aunque los clientes además tienen la opción de dejar los correos en el servidor tras su descarga.
+
+\begin{block}{Aclaracion}
+\small Este diseño fue resultante de la situación donde los clientes frecuentemente solo tenian acceso a internet de forma temporal, y su propósito era el de permitirles transmitir la información para despues poder ser manipulada sin necesidad de una conexión constante con el servidor.
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Protocolos -  POP3(2/2)}
+\tableofcontents
+\begin{itemize}
+\item \small Un servidor de POP3 espera en el \textbf{puerto 110} a las solicitudes de servicio.
+\item \small Los mensajes disponibles al cliente son determinados cuando una sesión de POP3 abre el buzón de correos y son identificados por número de mensaje, relacionado con esa sesion, o por un identificador asignado por el servidor; este es permanente y único al buzon, permitiendo al cliente acceder al mensaje en distintas sesiones. El correo es requisado y marcado para su borrado, acción que se realizara una vez que se cierre la sesion.
+\item \small La comunicación puede ser encriptada por POP3 tras su pedido,  luego de que se haya iniciado el protocolo, usando comandos SLTS or mediante POP3S; este se conecta al servidor usando TLS o SSL a través del \textbf{puerto TCP 995}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Protocolos - IMAP}
+\tableofcontents
+\small El \textbf{ Protocolo de Acceso de Mensajes de Internet} es un protocolo de recibo de mail desde un servidor de correos. Este permite a un cliente a acceder a sus correos en un servidor de correos.
+
+\small El uso de este se basa en el simple acceso a un buzón de correos de una base de datos, sin necesidad de descargar los mails para su manipulación. 
+
+\small A diferencia de POP, este está construido de manera que la información y los correos se mantienen dentro de la base de datos, siendo enviados a los usuarios tras su pedido, y no en las máquinas de los clientes por lo que requieren de una conexión de internet constante para manipularlos. Esto permite que varios clientes puedan acceder a un mismo buzón de correos.
+
+\small Un servidor IMAP recibe mensajes del \textbf{puerto 143}, mientras que IMAPS usa el \textbf{puerto 993}.
+
+\begin{block}{Aclaracion}
+\small En general, los servidores de buzón de correos permiten el uso de tanto los protocolos de sus propietarios como los protocolos genéricos IMAP y POP, con el propósito de mantener cierta flexibilidad y universalidad.
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato}
+\tableofcontents
+\small El formato de mensaje de Internet básico usado para los emails está definido por \textbf{RFC 5322}, con codificación de datos no ASCII y archivos adjuntos multimedia siendo definidos por \textbf{RFC 2045} y por medio de\textbf{ RFC 2049}, colectivamente llamados \textbf{Multipurpose Internet Mail Extensions} o MIME.
+
+\small Los mensajes de correo electrónico consisten de dos secciones principales: el \textbf{ header} y \textbf{cuerpo del mensaje}, conocidos en conjunto como el \textbf{contenido}. El header está separado del cuerpo por una línea en blanco.
+
+\small Durante el proceso de transportar mensajes de correo entre sistemas, SMPT comunica los parámetros de envío e información usando el header de los mensajes. El cuerpo contiene el mensaje como texto sin estructura, a veces con un bloque de firma al final. 
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato - Header(1/3)}
+\tableofcontents
+\textbf{RFC 5322} especifica la sintaxis del header del mensaje: 
+\begin{itemize}
+\item \small Cada mensaje tiene un header compuesto de un número de campos
+\item \small Cada campo tiene un nombre, seguido por el caracter separador “:”, y un valor (su “cuerpo”).
+\item \small El nombre de cada campo debe empezar en el primer caracter de una nueva línea en el sector de header y empezar con un caracter imprimible. 
+\item \small El valor puede continuar en varias líneas si esas líneas tienen un espacio o tabulación como su primer caracter. 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato - Header(2/3)}
+\tableofcontents
+\textbf{RFC 5322} especifica la sintaxis del header del mensaje: 
+\begin{itemize}
+\item \small Cada mensaje tiene un header compuesto de un número de campos
+\item \small Cada campo tiene un nombre, seguido por el caracter separador “:”, y un valor (su “cuerpo”).
+\item \small El nombre de cada campo debe empezar en el primer caracter de una nueva línea en el sector de header y empezar con un caracter imprimible. 
+\item \small El valor puede continuar en varias líneas si esas líneas tienen un espacio o tabulación como su primer caracter. 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{TEST}
+\tableofcontents
+Ademas, \textbf{RFC 3864} provee nombres de campos permanentes y provisionales. Algunos de estos incluyen:
+\begin{columns}
+
+\begin{column}{0.5\textwidth}
+\begin{itemize}
+\item \small \textbf{Para:} Direccion(es) de email
+\item \small \textbf{Asunto:} Un resumen breve del mensaje
+\item \small \textbf{CC (Carbon copy):} Copia exacta del mail original.
+\item \small \textbf{ID del mensaje:} Campo autogenerado para identificacion
+\end{itemize}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\begin{itemize}
+\item \small \textbf{En respuesta a:} ID del mensaje al que este es una respuesta.
+\item \small \textbf{Responder a:} Dirección a la que responder al mensaje
+\item \small \textbf{Remitente:} Dirección del remitente verdadero
+\item \small \textbf{Archivado en:} Un enlace directo a la forma archivada de un mensaje 
+\end{itemize}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato - Header(3/3)}
+\tableofcontents
+Los datos pertinentes a la actividad del servidor también son parte del header:
+\begin{itemize}
+\item \small \textbf{Recibido:} Cuando un servidor SMTP acepta un mensaje, pone esta información al final del header.
+\item \small \textbf{Camino de retorno:} Cuando un servidor SMTP hace la entrega final de un mensaje, inserta esta información al final del header.
+\end{itemize}
+Otros campos que son añadidos al final del header por el servidor que recibe pueden ser llamados campos de traza, en un sentido más amplio
+\begin{itemize}
+\item \small \textbf{Resultados de autenticación:} De chequeos de autenticación, para el consumo de agentes subsiguientes.
+\item \small \textbf{SPF recibidos:} guarda los resultados de chequeos SPF en más detalle que Resultados de autenticación.
+\item \small \textbf{Auto-submitido:} Es usado para marcar mensajes automáticamente generados.
+\item \small \textbf{Información VBR:} Solicita validación VBR.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato - Cuerpo(1/2)}
+\tableofcontents
+\small El correo electrónico fue diseñado, originalmente, para ASCII de 7 bits. La mayor parte del software de mail puede trabajar con codificaciones de 8 bits, pero debe asumir que se va a comunicar con servidores y lectores de mail de 7 bits.
+\small El estándar MIME introdujo especificadores de set de caracteres y dos codificaciones de transferencia de contenido para permitir la transmisión de datos no-ASCII: quoted printable para contenido de mayoritariamente 7 bits con pocos caracteres fuera de ese rango y base64 para datos binarios arbitrarios. 
+
+\begin{block}{Aclaracion}
+\small Las extensiones 8BITMIME y BINARY fueron introducidas para permitir la transmisión de correos sin la necesidad de estas codificaciones, pero muchos agentes de transportación de correo todavía no los soportan completamente.
+\small En algunos países, varios tipos de codificaciones coexisten; como resultado, por defecto, los mensajes en alfabetos no latinos aparecen en forma ilegible (la única excepción es una coincidencia, cuando tanto el emisor como el recipiente usan el mismo tipo de codificación). Por esto, para sets internacionales de caracteres, Unicode se está volviendo más popular.
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato - Texto plano y HTML}
+\tableofcontents
+\small La mayoría de clientes de correo gráficos permiten el uso de texto plano o HTML para el cuerpo del mensaje, a discreción del usuario. Los mensajes de correo HTML usualmente incluyen una copia de texto plano automáticamente generada por razones de compatibilidad. 
+
+Las ventajas de HTML incluyen la habilidad de incluir links e imágenes en las líneas en si, separar mensajes previos en bloques para citas, acomodarse naturalmente en cualquier display, usar énfasis como subrayado y cursiva, y cambiar estilos de fuente. 
+
+Desventajas incluyen el aumento del tamaño del mail, los problemas posibles de viruses, el abuso de mails HTML como un medio para ataques de phishing y la propagación de malware.
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato - Servers y Apps de usuario}
+\tableofcontents
+\begin{alertblock}
+\footnotesize En algunos foros se recomienda que todas las publicaciones están hechas en texto plano, con 72 o 80 caracteres por línea por todas las razones anteriores, pero también porque tiene un número significativo de lectores usando clientes de correo electrónico basados en texto como, por ejemplo,  Mutt.
+\end{alertblock}
+\small El correo puede ser almacenado en el cliente, en el lado del servidor, o en ambos. Los formatos estándar para los buzones de correo incluyen Maildir y mbox.
+
+\small Muchos clientes de correo electrónico prominentes usan su propio formato y necesitan un software de conversión para transferir correo electrónico entre ellos.
+
+\small El almacenamiento del lado del servidor está generalmente en un formato propietario, pero como el acceso es con un protocolo estándar como, por ejemplo, el IMAP, mover correo electrónico de un servidor a otro se puede hacer con cualquier MUA que soporte el protocolo.
+
+\small Además, muchos usuario de correo electrónico actual no usan programas MTA, MDA o MUA por su cuenta, en cambio usan plataformas web, como, por ejemplo, Gmail o Yahoo! Mail, que realiza las misma tareas. 
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato - Guardado de mails(1/2)}
+\tableofcontents
+\small Cuando se reciben los mensajes por correo electrónico, las aplicaciones de clientes de correo electrónico guardan los mensajes en los sistemas de archivos del sistema operativo. Algunos clientes guardan mensajes individuales como archivos separados, mientras que otros usan varios formatos de bases de datos, generalmente propietarios, para almacenamiento colectivo. El formato específico utilizado generalmente se indica con diferentes extensiones de archivo.
+
+\begin{block}{Aclaracion}
+\footnotesize Algunas aplicaciones (como Apple Mail) dejan los archivos adjuntos codificados en mensajes para buscar mientras también guarda copias separadas de los archivos adjuntos. Otros separan los archivos adjuntos de los mensajes y los guardan en directorios especificos
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Formato - Guardado de mails(2/2)}
+\tableofcontents
+\begin{itemize}
+\item \small \textbf{mbox:} es un estándar de almacenamiento histórico.
+\item \small \textbf{eml:} Usado por muchos clientes de correo electrónico, incluyendo Novell GroupWise, Microsoft Outlook Express, Lotus notes, Windows Mail, Mozilla Thunderbird, y Postbox. Los archivos contiene los contenidos de los correos electrónicos como texto plano en formato MIME, contiene el Header y el cuerpo del del correo electrónico, incluyendo archivos adjuntos en  uno de muchos formatos.
+\item \small \textbf{emlx:} Utilizado por Apple Mail
+\item \small \textbf{msg:} Utilizado por Microsoft Office Outlook y OfficeLogic Groupware.
+\item \small \textbf{mbx:} Utilizado por Opera Mail, KMail, y Apple Mail basandose en el formato mbox.
+\end{itemize}
 
 \end{frame}
 
